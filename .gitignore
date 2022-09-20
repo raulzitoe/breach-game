@@ -1,0 +1,10 @@
+/client/.cache
+/client/.venv
+/client/dist
+/client/node_modules
+/client/package-lock.json
+*.pyc
+*.pyo
+/server/flask_session/
+/server/__pycache__
+/server/app/__pycache__

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+  <script src="{{ url_for('static', filename='pixi/pixi.min.js')}}"></script>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+  <p>Debug Game state (at page load): {{ game_state }}</p>
+  <p>Debug Session: {{ session }}</p>
+  <p>Debug POST: {{ post_data }}</p>
+  <p>Debug SocketIO: <span id="socketio_received"></span></p>
+<div style="border: 1px solid black; margin: 10px; padding: 10px;">
+  <h2>Breach</h2>
+  <div class='setup'>
+    <span>Actions: </span>
+    <form method='POST'>
+      {% if session.game_id %}
+      <button class='play' name="action" value="end_game" type="submit">End Game</button>
+      {% else %}
+      <button class='play' name="action" value="create_game" type="submit">Start Game</button>
+      or
+      <input type="text" name="token"> <button class='play' name="action" value="join_game" type="submit">Join Game</button>
+      {% endif %}
+    </form>
+  </div>
+  {% if session.game_id %}
+  <div class="board">
+    <p>Player1 Pos: <span id="player1_pos">{{ game_state.player1_pos }}</span>{% if session.current_player == "player1" %} (you){% endif%}</p>
+    <p>Player2 Pos: <span id="player2_pos">{{ game_state.player2_pos }}</span>{% if session.current_player == "player2" %} (you){% endif%}</p>
+  </div>
+  <div class="controls">
+    <p>SocketIO Actions:</p>
+    <button class='play' id="left">Left</button>
+    <button class='play' id="right">Right</button>  
+  </div>
+  {% endif %}
+</div>
+
+  <script type="text/javascript">
+playing = true
+$(document).ready(function(){
+    const socket = io();
+    //actions
+    $('#left').click(function(){
+        socket.emit('next_pos', {'action':'left'})
+    })
+    $('#right').click(function(){
+        socket.emit('next_pos', {'action':'right'})
+    })
+    socket.on('update_status', (data) => {
+      for (const [key, value] of Object.entries(data)) {
+          console.log(key + " = " + value);
+          $("#" + key).text(value);
+
+          // Write debug on HTML
+          $('#socketio_received').text(JSON.stringify(data));
+        }
+    })
+})
+  </script>
+</body>
+</html>

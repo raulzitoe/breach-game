@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+  <script src="{{ url_for('static', filename='pixi/pixi.min.js')}}"></script>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class='setup'>
+    <h1>Select the size of the dungeon</h1>
+    <form method='POST'>
+      {% if session.game_id %}
+      <button class='play' name="action" value="right" type="submit">Right</button>
+      <button class='play' name="action" value="end_game" type="submit">End Game</button>
+      {% else %}
+      <button class='play' name="action" value="create_game" type="submit">Start Game</button>
+      
+      {% endif %}
+    </form>
+</div>
+<div class="controls">
+  <div class="left">left</div>
+  <div class="up_down">
+      <div class="up">up</div>
+      <div class="down">down</div>
+  </div>
+  <div class="right">right</div>    
+</div>
+<p>Debug Session: {{ session }}</p>
+<p>Debug POST: {{ post_data }}</p>
+
+  <script type="text/javascript">
+playing = true
+$(document).ready(function(){
+    const socket = io();
+    //actions
+    $('.left').click(function(){
+        if (playing) {
+          socket.emit('next_pos', {'action':'left'})
+        }
+    })
+    $('.right').click(function(){
+        if (playing) socket.emit('next_pos', {'action':'right'})
+    })
+    $('.up').click(function(){
+        if (playing) socket.emit('next_pos', {'action':'up'})
+    })
+    $('.down').click(function(){
+        if (playing) socket.emit('next_pos', {'action':'down'})
+    })
+    socket.on('update_status', (data)=>{
+        alert(data['x']);
+    })
+})
+
+let type = "WebGL";
+if (!PIXI.utils.isWebGLSupported()) {
+  type = "canvas";
+}
+
+//Aliases
+const Application = PIXI.Application,
+    loader = PIXI.Loader.shared,
+    resources = PIXI.Loader.shared.resources,
+    TextureCache = PIXI.utils.TextureCache,
+    Sprite = PIXI.Sprite;
+
+//Create a Pixi Application
+const app = new Application({ 
+    width: 256, 
+    height: 256,                       
+    antialias: true, 
+    transparent: false, 
+    resolution: 1
+  }
+);
+
+//Add the canvas that Pixi automatically created for you to the HTML document
+document.body.appendChild(app.view);
+
+loader.onProgress.add(loadProgressHandler)
+
+loader
+  .add({url: "{{ url_for('static', filename='images/tileset.png')}}"})
+  .load(setup);
+
+function loadProgressHandler(loader, resource) {
+
+  //Display the file `url` currently being loaded
+  console.log("loading: " + resource.url); 
+
+  //Display the percentage of files currently loaded
+  console.log("progress: " + loader.progress + "%"); 
+
+  //If you gave your files names as the first argument 
+  //of the `add` method, you can access them like this
+  //console.log("loading: " + resource.name);
+}
+
+//This `setup` function will run when the image has loaded
+function setup() {
+
+  //Create the `tileset` sprite from the texture
+  const texture = TextureCache["{{ url_for('static', filename='images/tileset.png')}}"];
+
+  //Create a rectangle object that defines the position and
+  //size of the sub-image you want to extract from the texture
+  //(`Rectangle` is an alias for `PIXI.Rectangle`)
+  const rectangle = new PIXI.Rectangle(32, 32, 128, 128);
+
+  //Tell the texture to use that rectangular section
+  texture.frame = rectangle;
+
+  //Create the sprite from the texture
+  const rocket = new Sprite(texture);
+
+  //Position the rocket sprite on the canvas
+  rocket.x = 32;
+  rocket.y = 32;
+
+  //Add the rocket to the stage
+  app.stage.addChild(rocket);
+  
+  //Render the stage   
+  app.renderer.render(app.stage);
+}
+  </script>
+  <p>Test</p>
+</body>
+</html>
