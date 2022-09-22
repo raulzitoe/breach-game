@@ -2,7 +2,7 @@ from flask import Flask
 from flask_redis import FlaskRedis
 from flask_socketio import SocketIO
 from flask_session import Session
-from .game_logic import GameManager
+from .game_manager import GameManager
 from uuid import uuid4
 
 app = Flask(__name__)

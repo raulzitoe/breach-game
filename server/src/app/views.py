@@ -45,6 +45,10 @@ def next_pos(message):
         new_pos = game_manager.move_left(session['game_id'], session['current_player'])
     elif message['action'] == 'right':
         new_pos = game_manager.move_right(session['game_id'], session['current_player'])
+    elif message['action'] == 'up':
+        new_pos = game_manager.move_up(session['game_id'], session['current_player'])
+    elif message['action'] == 'down':
+        new_pos = game_manager.move_down(session['game_id'], session['current_player'])
     
     emit('update_status', 
                 {f"{session['current_player']}_pos": new_pos}, 
