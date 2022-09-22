@@ -28,9 +28,8 @@
   </div>
   {% if session.game_id %}
   <div class="board">
-    <p>Player1 Pos: <span id="player1_pos">{{ game_state.player1_pos }}</span>{% if session.current_player == "player1" %} (you){% endif%}</p>
-    <p>Player2 Pos: <span id="player2_pos">{{ game_state.player2_pos }}</span>{% if session.current_player == "player2" %} (you){% endif%}</p>
-    <p>Player Turn: <span id="player2_pos">{{ game_state.player_turn }}</span></p>
+    <p>Player1 Pos: <span id="player1_pos">{{ game_state.player1_pos[0] }}, {{ game_state.player1_pos[1] }}</span>{% if session.current_player == "player1" %} (you){% endif%}</p>
+    <p>Player2 Pos: <span id="player2_pos">{{ game_state.player2_pos[0] }}, {{ game_state.player2_pos[1] }}</span>{% if session.current_player == "player2" %} (you){% endif%}</p>
   </div>
   <div class="controls">
     <p>SocketIO Actions:</p>
@@ -62,7 +61,7 @@ $(document).ready(function(){
     socket.on('update_status', (data) => {
       for (const [key, value] of Object.entries(data)) {
           console.log(key + " = " + value);
-          $("#" + key).text(value);
+          $("#" + key).text(value[0] + ", " + value[1]);
 
           // Write debug on HTML
           $('#socketio_received').text(JSON.stringify(data));

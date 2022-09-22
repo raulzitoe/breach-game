@@ -35,24 +35,11 @@ class GameManager:
         self.redis_client.hset("breach:player1_y_pos", game_id, p1_y)
         self.redis_client.hset("breach:player2_x_pos", game_id, p2_x)
         self.redis_client.hset("breach:player2_y_pos", game_id, p2_y)
-        self.redis_client.hset("breach:player_turn", game_id, 1)
 
         return {
-            'player1_pos': "{}, {}".format(p1_x, p1_y),
-            'player2_pos': "{}, {}".format(p2_x, p2_y),
-            'player_turn': 1
-        }
-
-    def check_player_turn(self, game_id, player):
-        turn = self.redis_client.hget(f"breach:player_turn", game_id)
-        return player == turn
-
-    def change_turn(self, game_id):
-        turn = self.redis_client.hset("breach:player_turn", game_id)
-        if turn == 1:
-            self.redis_client.hset("breach:player_turn", game_id, 2)
-        else:
-            self.redis_client.hset("breach:player_turn", game_id, 1)  
+            'player1_pos': (p1_x, p1_y),
+            'player2_pos': (p2_x, p2_y)
+        } 
 
     def get_board(self, game_id):
         p1_x = int(self.redis_client.hget("breach:player1_x_pos", game_id))
@@ -62,8 +49,7 @@ class GameManager:
         return {
             'game_id': game_id,
             'player1_pos': (p1_x, p1_y),
-            'player2_pos': (p2_x, p2_y),
-            'player_turn': int(self.redis_client.hget("breach:player_turn", game_id))
+            'player2_pos': (p2_x, p2_y)
         }
 
     def join_game(self, token):
