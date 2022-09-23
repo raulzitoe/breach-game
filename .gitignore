@@ -8,3 +8,4 @@
 /server/flask_session/
 /server/__pycache__
 /server/app/__pycache__
+server/src/flask_session/
